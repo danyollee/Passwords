@@ -1,25 +1,30 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h> //Includes the "getpass" function. This lets the user type without it actually being displayed on screen.
 
 using namespace std;
 
 //prototypes
 string set_username(string);
-string set_password(string, char*, int, int);
+string set_password(string, char*, int);
 int* scramble_password(string, char*, int, int*);
-void login(string, int*);
+void login(string, int*, char*);
 
 int main(){
   string username, password;
   char *pw;
-  int length=0, trigger=0, *scrambled_pw;
+  int length=0, *scrambled_pw;
 
   username=set_username(username);
-  password=set_password(password, pw, length, trigger);
+  password=set_password(password, pw, length);
   scrambled_pw=scramble_password(password, pw, length, scrambled_pw);
 
-  login(username, scrambled_pw);
+  for(int i=0; i<100; i++){
+    cout << endl;
+  }
+
+  login(username, scrambled_pw, pw);
 
   return 0;
 }
@@ -30,44 +35,51 @@ string set_username(string username){
   return username;
 }
 
-string set_password(string password, char* pw, int length, int trigger){
-  while(trigger<3){
-    cout << "Enter a password\n(Password must be at least 6 characters long, contain a number, and a capital letter)\n";
-    cin >> password;
+string set_password(string password, char* pw, int length){
+  int leg_trig=0, num_trig=0, cap_trig=0;
+  bool valid=false;
 
-    length = password.length();
+  while(valid==false){
+    password=getpass("Enter a password\n(Password must be at least 6 characters long, contain a number, and a capital letter)\n");
 
-    pw = new char[length];
+    length=password.length();
+
+    pw=new char[length];
 
     strcpy(pw, password.c_str());
 
     for(int i=0; i<length; i++){
       if(length>6){
-        trigger++;
+        leg_trig++;
       }
       for(int j=48; j<58; j++){
         if(pw[i]==j){
-          trigger++;
+          num_trig++;
         }
       }
       for(int k=65; k<91; k++){
         if(pw[i]==k){
-          trigger++;
+          cap_trig++;
         }
       }
     }
 
-    if(trigger<3){
+    if(leg_trig==0 || num_trig==0 || cap_trig==0){
       cout << "Error, not a valid password. Try again.\n";
+      valid=false;
+    }
+    else{
+      valid=true;
     }
   }
+
   return password;
 }
 
 int* scramble_password(string password, char* pw, int length, int* scrambled_pw){
-  length = password.length();
-  pw = new char[length];
-  scrambled_pw = new int[length];
+  length=password.length();
+  pw=new char[length];
+  scrambled_pw=new int[length];
   strcpy(pw, password.c_str());
 
   for(int i=0; i<length; i++){
@@ -78,14 +90,49 @@ int* scramble_password(string password, char* pw, int length, int* scrambled_pw)
   return scrambled_pw;
 }
 
-void login(string username, int* scrambled_pw){
+void login(string username, int* scrambled_pw, char* pw){
+  int counter=0, length=0, *login_pw_compare;
   string login_user, login_pass;
+  bool user_match=false, pw_match=false;
 
-  cout << "What is your username?: ";
-  cin >> login_user;
+  while(user_match==false){
+    cout << "Enter your username: ";
+    cin >> login_user;
 
-  cout << "What is your password?: ";
-  cin >> login_pass;
+    if(login_user==username){
+      user_match=true;
+    }
+    else{
+      cout << "Incorrect username. ";
+      user_match=false;
+    }
+  }
 
+  while(pw_match==false){
+    login_pass=getpass("Enter your password: ");
+    length=login_pass.length();
+    pw=new char[length];
+    login_pw_compare=new int[length];
+    strcpy(pw, login_pass.c_str());
 
+    for(int i=0; i<length; i++){
+      login_pw_compare[i]=(((pw[i]*6)+19)/2)*16;
+    }
+
+    for(int i=0; i<length; i++){
+      if(login_pw_compare[i]==scrambled_pw[i]){
+        counter++;
+      }
+    }
+
+    if(counter==length){
+      pw_match=true;
+    }
+    else{
+      pw_match=false;
+    }
+
+    cout << "You've logged in successfully!" << endl;
+
+  }
 }
