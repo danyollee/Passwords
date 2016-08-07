@@ -12,7 +12,8 @@ string set_username(string);
 string set_password(string, char*, int);
 int* scramble_password(string, char*, int, int*);
 void login(string, int*, char*, ofstream&);
-void  login_success(ofstream&);
+void login_success(ofstream&);
+void write_to_file(ofstream&);
 
 int main(){
   string username, password;
@@ -150,13 +151,26 @@ void login(string username, int* scrambled_pw, char* pw, ofstream& file){
 }
 
 void login_success(ofstream& file){
-  string file_name, frame;
-  time_t now = time(0);
+  time_t now = time(0); //Gets the current time
+  int choice;
 
-  cout << "You've logged in successfully!\n\nThe time is " << asctime(localtime(&now)) << endl;
+  cout << "\nLOGIN SUCCESS\n\nThe time is " << asctime(localtime(&now)) << endl;
+
+  cout << "1. Write to a file";
+  cin >> choice;
+
+  if(choice==1){
+    write_to_file(file);
+  }
+
+}
+
+void write_to_file(ofstream& file){
+  string file_name, frame;
+
   cout << "Enter a file to write to: ";
   cin >> file_name;
-  file.open(file_name.c_str());
+  file.open(file_name.c_str(), ios_base::app); //ios_base::app makes it append to whatever is on the file so it doesn't clear the entire file each time you open it. 
   while(!file){
     cout << "Invalid. File doesn't exist. Try again: ";
     cin >> file_name;
@@ -171,5 +185,4 @@ void login_success(ofstream& file){
   file << frame << endl;
 
   file.close();
-
 }
