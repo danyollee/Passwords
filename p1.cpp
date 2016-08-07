@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h> //Includes the "getpass" function. This lets the user type without it actually being displayed on screen.
 #include <fstream>
+#include <ctime> //Includes time
 
 using namespace std;
 
@@ -11,6 +12,7 @@ string set_username(string);
 string set_password(string, char*, int);
 int* scramble_password(string, char*, int, int*);
 void login(string, int*, char*, ofstream&);
+void  login_success(ofstream&);
 
 int main(){
   string username, password;
@@ -22,9 +24,11 @@ int main(){
   password=set_password(password, pw, length);
   scrambled_pw=scramble_password(password, pw, length, scrambled_pw);
 
-  for(int i=0; i<25; i++){
+  for(int i=0; i<50; i++){
     cout << endl;
   }
+
+  cout << "Login:\n";
 
   // cout << "The password is " << password << endl;
   login(username, scrambled_pw, pw, file);
@@ -95,7 +99,7 @@ int* scramble_password(string password, char* pw, int length, int* scrambled_pw)
 
 void login(string username, int* scrambled_pw, char* pw, ofstream& file){
   int counter=0, length=0, *login_pw_compare;
-  string login_user, login_pass, file_name, frame;
+  string login_user, login_pass;
   bool user_match=false, pw_match=false;
 
   while(user_match==false){
@@ -113,7 +117,7 @@ void login(string username, int* scrambled_pw, char* pw, ofstream& file){
 
   while(pw_match==false){
     login_pass=getpass("Enter your password: ");
-    cout << "the login_pass is " << login_pass << endl;
+    // cout << "the login_pass is " << login_pass << endl;
     length=login_pass.length();
     pw=new char[length];
     login_pw_compare=new int[length];
@@ -138,11 +142,18 @@ void login(string username, int* scrambled_pw, char* pw, ofstream& file){
       delete [] pw;
       pw_match=false;
     }
-    // cout << "here'" << endl;
   }
 
-  cout << "You've logged in successfully! ";
+  if(user_match==true && pw_match==true){
+    login_success(file);
+  }
+}
 
+void login_success(ofstream& file){
+  string file_name, frame;
+  time_t now = time(0);
+
+  cout << "You've logged in successfully!\n\nThe time is " << asctime(localtime(&now)) << endl;
   cout << "Enter a file to write to: ";
   cin >> file_name;
   file.open(file_name.c_str());
