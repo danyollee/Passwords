@@ -12,8 +12,9 @@ string set_username(string);
 string set_password(string, char*, int);
 int* scramble_password(string, char*, int, int*);
 void login(string, int*, char*);
-void login_success();
+void login_success(string);
 void read_file();
+void decrypt_file();
 void write_to_file();
 
 int main(){
@@ -118,7 +119,6 @@ void login(string username, int* scrambled_pw, char* pw){
 
   while(pw_match==false){
     login_pass=getpass("Enter your password: ");
-    // cout << "the login_pass is " << login_pass << endl;
     length=login_pass.length();
     pw=new char[length];
     login_pw_compare=new int[length];
@@ -146,36 +146,103 @@ void login(string username, int* scrambled_pw, char* pw){
   }
 
   if(user_match==true && pw_match==true){
-    login_success();
+    login_success(login_pass);
   }
 }
 
-void login_success(){
+void login_success(string login_pass){
   time_t now = time(0); //Gets the current time
   int choice;
+  bool in=true, dc_wall=false;
+  string dc_pass; //decrypt_password
 
   cout << "\nLOGIN SUCCESS\n\nThe time is " << asctime(localtime(&now)) << endl;
 
-  cout << "1. Read a file\n2. Write to a file\n";
-  cin >> choice;
+  while(in==true){
+    cout << "1. Read a file\n2. Decrypt a file\n3. Write to a file\n4. Logout\n";
+    cin >> choice;
 
-  if(choice==1){
-    read_file();
-  }
+    if(choice==1){
+      read_file();
+      in=true;
+    }
 
-  if(choice==2){
-    write_to_file();
+    if(choice==2){
+      while(dc_wall==false){
+        dc_pass=getpass("Re-enter your password: ");
+        if(dc_pass!=login_pass){
+          dc_wall=false;
+        }else{
+          dc_wall=true;
+        }
+      }
+      decrypt_file();
+      in=true;
+    }
+
+    if(choice==3){
+      write_to_file();
+      in=true;
+    }
+
+    if(choice==4){
+      cout << "\nLOGOUT SUCCESS\n";
+      in=false;
+    }
   }
 
 }
 
 void read_file(){
   ifstream file;
-  string file_name;
+  string file_name, line;
 
   cout << "Enter a file to read: ";
   cin >> file_name;
+  file.open(file_name.c_str());
+  while(!file.eof()){
+    getline(file, line);
+
+    cout << line;
+  }
+
+  cout << endl;
 }
+
+void decrypt_file(){
+  ifstream file;
+  string file_name, line, temp;
+  char* decrypt;
+  int length;
+
+  cout << "\nSuccess\n";
+
+  cout << "Enter a file to decrypt: ";
+  cin >> file_name;
+  file.open(file_name.c_str()); //Opens the file
+  while(!file.eof()){ //Reads the file until the end
+    getline(file, line); //Inputs the scanned line into a string
+    length=line.length();
+
+    decrypt = new char[length];
+    strcpy(decrypt, line.c_str());
+
+    for(int i=0; i<length; i++){ //Decrypts the string. It is the opposite of the encryption
+      if(decrypt[i]==' '){
+        decrypt[i]=decrypt[i]-10;
+      }else{
+        decrypt[i]=decrypt[i]+10;
+      }
+    }
+
+    temp=decrypt; //Puts the decrypted thing into the string
+
+    cout << temp << endl;
+  }
+
+  file.close();
+}
+
 void write_to_file(){
   ofstream file;
   string file_name, frame;
@@ -185,12 +252,6 @@ void write_to_file(){
   cout << "Enter a file to write to: ";
   cin >> file_name;
   file.open(file_name.c_str(), ios_base::app); //ios_base::app makes it append to whatever is on the file so it doesn't clear the entire file each time you open it.
-  while(!file){
-    cout << "Invalid. File doesn't exist. Try again: ";
-    cin >> file_name;
-    file.open(file_name.c_str());
-    getline(cin, file_name);
-  }
 
   cin.ignore(); //Clears the cin buffer which allows getline
   cout << "What do you want to output?: ";
@@ -205,8 +266,9 @@ void write_to_file(){
   for(int i=0; i<length; i++){ //Scans through the inputted string
     if(encrypt[i]==' '){ //If scanned element is a space, then add 10 to the ASCII value
       encrypt[i]=encrypt[i]+10;
+    }else{
+      encrypt[i]=encrypt[i]-10; //Else, subtract 10 from the ASCII value
     }
-    encrypt[i]=encrypt[i]-10; //Else, subtract 10 from the ASCII value
   }
 
   frame=encrypt; //Copies the array into a string
