@@ -11,15 +11,15 @@ using namespace std;
 string set_username(string);
 string set_password(string, char*, int);
 int* scramble_password(string, char*, int, int*);
-void login(string, int*, char*, ofstream&);
-void login_success(ofstream&);
-void write_to_file(ofstream&);
+void login(string, int*, char*);
+void login_success();
+void read_file();
+void write_to_file();
 
 int main(){
   string username, password;
   char *pw;
   int length=0, *scrambled_pw;
-  ofstream file;
 
   username=set_username(username);
   password=set_password(password, pw, length);
@@ -32,7 +32,7 @@ int main(){
   cout << "Login:\n";
 
   // cout << "The password is " << password << endl;
-  login(username, scrambled_pw, pw, file);
+  login(username, scrambled_pw, pw);
 
   return 0;
 }
@@ -98,7 +98,7 @@ int* scramble_password(string password, char* pw, int length, int* scrambled_pw)
   return scrambled_pw;
 }
 
-void login(string username, int* scrambled_pw, char* pw, ofstream& file){
+void login(string username, int* scrambled_pw, char* pw){
   int counter=0, length=0, *login_pw_compare;
   string login_user, login_pass;
   bool user_match=false, pw_match=false;
@@ -146,31 +146,45 @@ void login(string username, int* scrambled_pw, char* pw, ofstream& file){
   }
 
   if(user_match==true && pw_match==true){
-    login_success(file);
+    login_success();
   }
 }
 
-void login_success(ofstream& file){
+void login_success(){
   time_t now = time(0); //Gets the current time
   int choice;
 
   cout << "\nLOGIN SUCCESS\n\nThe time is " << asctime(localtime(&now)) << endl;
 
-  cout << "1. Write to a file";
+  cout << "1. Read a file\n2. Write to a file\n";
   cin >> choice;
 
   if(choice==1){
-    write_to_file(file);
+    read_file();
+  }
+
+  if(choice==2){
+    write_to_file();
   }
 
 }
 
-void write_to_file(ofstream& file){
+void read_file(){
+  ifstream file;
+  string file_name;
+
+  cout << "Enter a file to read: ";
+  cin >> file_name;
+}
+void write_to_file(){
+  ofstream file;
   string file_name, frame;
+  int length;
+  char* encrypt;
 
   cout << "Enter a file to write to: ";
   cin >> file_name;
-  file.open(file_name.c_str(), ios_base::app); //ios_base::app makes it append to whatever is on the file so it doesn't clear the entire file each time you open it. 
+  file.open(file_name.c_str(), ios_base::app); //ios_base::app makes it append to whatever is on the file so it doesn't clear the entire file each time you open it.
   while(!file){
     cout << "Invalid. File doesn't exist. Try again: ";
     cin >> file_name;
@@ -182,7 +196,22 @@ void write_to_file(ofstream& file){
   cout << "What do you want to output?: ";
   getline(cin, frame);
 
-  file << frame << endl;
+  length=frame.length(); //This gets the length for the character array used to encrypt
+
+  encrypt = new char[length];
+
+  strcpy(encrypt, frame.c_str()); //Copies the string into the character array
+
+  for(int i=0; i<length; i++){ //Scans through the inputted string
+    if(encrypt[i]==' '){ //If scanned element is a space, then add 10 to the ASCII value
+      encrypt[i]=encrypt[i]+10;
+    }
+    encrypt[i]=encrypt[i]-10; //Else, subtract 10 from the ASCII value
+  }
+
+  frame=encrypt; //Copies the array into a string
+
+  file << frame << endl; //Appends it to the file
 
   file.close();
 }
