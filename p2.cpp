@@ -5,8 +5,24 @@
 #include <fstream>
 #include <ctime> //Includes time
 
-int main(){
+using namespace std;
 
+//prototypes
+string set_username(string);
+
+int main(){
+  string username, password;
+  char *key;
+
+  username=set_username(username);
+
+  cout << username << endl;
 
   return 0;
+}
+
+string set_username(string username){
+  cout << "Enter a username: ";
+  cin >> username;
+  return username;
 }
