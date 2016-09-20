@@ -24,7 +24,7 @@ int main(){
   fill_coders(coder_a, coder_A, coder_num);
   username=set_username(username);
   password=set_password(password);
-  setup_password(password, login_password, key, coder_a, coder_A, coder_num);
+  setup_password(password, login_password, key, coder_A, coder_a, coder_num);
 
   // delete [] login_password;
 
@@ -127,20 +127,10 @@ void setup_password(string password, char login_password[], int key[], char code
   length=password.length();
   login_password=new char[length];
 
-  cout << "ADF  ";
-
-  for(int i=0; i<length; i++){
-    cout << login_password[i];
-  }
-
   cout << endl;
 
   temp=new char[length];
   strcpy(temp, password.c_str());
-
-  for(int i=0; i<length; i++){
-    cout << temp[i];
-  }
 
   for(int i=0; i<length; i++){
     if(counter>2){
@@ -149,22 +139,19 @@ void setup_password(string password, char login_password[], int key[], char code
     if(temp[i]>=65 && temp[i]<=90){
       key_rando=key[counter];
       rando=temp[i]-65;
-      cout << rando << endl;
       login_password[i]=upper_grid(rando, key_rando, coder_A);
-      counter++;
     }
     if(temp[i]>=97 && temp[i]<=122){
+      key_rando=key[counter];
       rando=temp[i]-97;
-      cout << rando << endl;
       login_password[i]=lower_grid(rando, key_rando, coder_a);
-      counter++;
     }
     if(temp[i]>=48 && temp[i]<=57){
       rando=5;
       key_rando=5;
       login_password[i]=number_grid(num_counter, key_rando, coder_num);
-      counter++;
     }
+    counter++;
   }
 
   for(int i=0; i<length; i++){
@@ -177,23 +164,19 @@ void setup_password(string password, char login_password[], int key[], char code
 }
 
 char upper_grid(int rando, int key_rando, char coder_A[][26]){
-  //figure out how to return the specific thing in the array
-  cout << "Here upper" << endl;
-  char temp=coder_A[rando][key_rando];
+  char pw=coder_A[rando][key_rando];
 
-  return temp;
+  return pw;
 }
 
 char lower_grid(int rando, int key_rando, char coder_a[][26]){
-  //figure out how to return the specific thing in the array
-  cout << "Here lower" << endl;
-  char temp=coder_a[rando][key_rando];
+  char pw=coder_a[rando][key_rando];
 
-  return temp;
+  return pw;
 }
 
 char number_grid(int rando, int key_rando, char coder_num[][10]){
-  //figure out how to return the specific thing in the array
-  cout << "Here number" << endl;
-  char temp=coder_num[rando][key_rando];
+  char pw=coder_num[rando][key_rando];
+
+  return pw;
 }
