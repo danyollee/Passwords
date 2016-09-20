@@ -147,8 +147,8 @@ void setup_password(string password, char login_password[], int key[], char code
       login_password[i]=lower_grid(rando, key_rando, coder_a);
     }
     if(temp[i]>=48 && temp[i]<=57){
-      rando=5;
-      key_rando=5;
+      key_rando=key[counter];
+      rando=temp[i]-48;
       login_password[i]=number_grid(num_counter, key_rando, coder_num);
     }
     counter++;
