@@ -28,27 +28,6 @@ int main(){
 
   // delete [] login_password;
 
-  // for(int i=0; i<26; i++){
-  //   for(int j=0; j<26; j++){
-  //     cout << coder_a[i][j] << " ";
-  //   }
-  //   cout << endl;
-  // }
-  //
-  // for(int i=0; i<26; i++){
-  //   for(int j=0; j<26; j++){
-  //     cout << coder_A[i][j] << " ";
-  //   }
-  //   cout << endl;
-  // }
-  //
-  // for(int i=0; i<10; i++){
-  //   for(int j=0; j<10; j++){
-  //     cout << coder_num[i][j] << " ";
-  //   }
-  //   cout << endl;
-  // }
-
   return 0;
 }
 
@@ -129,8 +108,10 @@ void setup_password(string password, char login_password[], int key[], char code
 
   cout << endl;
 
-  temp=new char[length];
-  strcpy(temp, password.c_str());
+  temp=new char[length+1];
+  // strcpy(temp, password.c_str());
+  copy(password.begin(), password.end(), temp);
+  temp[length]='\0';
 
   for(int i=0; i<length; i++){
     if(counter>2){
